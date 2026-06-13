@@ -1,26 +1,499 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fbfaf5;
+  --background-elevated: #f3efe4;
+  --background-card: #ffffff;
+  --foreground: #161412;
+  --foreground-muted: #5b554b;
+  --foreground-dim: #8c8779;
+  --border: #e6dfcc;
+  --border-strong: #cdc3a8;
+  --tile-edge: #b8a982;
+  --mahjong-green: #0f6b3b;
+  --mahjong-green-dark: #0a5530;
+  --mahjong-green-soft: #e3f0e6;
+  --mahjong-red: #c8102e;
+  --mahjong-red-dark: #99081f;
+  --mahjong-red-soft: #fae3e6;
+  --gold: #b8892b;
+  --gold-soft: #f5ebcf;
+  --score-positive: #15a34a;
+  --score-positive-dark: #0e7a37;
+  --score-negative: #c8102e;
+  --rank-1: #c8102e;
+  --rank-2: #0f6b3b;
+  --rank-3: #b8892b;
+  --rank-4: #6b675c;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-background-elevated: var(--background-elevated);
+  --color-background-card: var(--background-card);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-foreground-dim: var(--foreground-dim);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-accent: var(--mahjong-green);
+  --color-accent-strong: var(--mahjong-green-dark);
+  --color-accent-soft: var(--mahjong-green-soft);
+  --color-danger: var(--mahjong-red);
+  --color-danger-soft: var(--mahjong-red-soft);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-score-positive: var(--score-positive);
+  --color-score-negative: var(--score-negative);
+  --color-rank-1: var(--rank-1);
+  --color-rank-2: var(--rank-2);
+  --color-rank-3: var(--rank-3);
+  --color-rank-4: var(--rank-4);
+  --font-sans: var(--font-sans-stack);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --font-sans-stack:
+    var(--font-inter), var(--font-noto-jp), -apple-system, BlinkMacSystemFont,
+    "Hiragino Sans", "Yu Gothic UI", system-ui, sans-serif;
+  --font-serif-stack:
+    var(--font-noto-serif), "Hiragino Mincho ProN", "Yu Mincho", serif;
 }
 
+html,
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans-stack);
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer components {
+  .page-shell {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+
+  .headline {
+    font-family: var(--font-serif-stack);
+    font-feature-settings: "palt";
+    letter-spacing: 0.02em;
+  }
+
+  .numeric {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+
+  .surface-card {
+    background: var(--background-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 1px 2px rgba(24, 22, 18, 0.04);
+  }
+
+  .section-title {
+    position: relative;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    color: var(--mahjong-green-dark);
+    padding-left: 0.85rem;
+  }
+
+  .section-title::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 16px;
+    background: var(--mahjong-red);
+    border-radius: 2px;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: var(--mahjong-green);
+    color: #fff;
+    font-weight: 600;
+    padding: 0.625rem 1.25rem;
+    border-radius: 8px;
+    transition: background 0.15s, transform 0.05s;
+    box-shadow: 0 1px 2px rgba(15, 107, 59, 0.25);
+  }
+
+  .btn-primary:hover {
+    background: var(--mahjong-green-dark);
+  }
+
+  .btn-primary:active {
+    transform: translateY(1px);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: var(--background-card);
+    color: var(--foreground);
+    font-weight: 500;
+    padding: 0.625rem 1.25rem;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--mahjong-green);
+    color: var(--mahjong-green);
+  }
+
+  .btn-hero {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: #fff;
+    color: var(--mahjong-green-dark);
+    font-weight: 700;
+    padding: 0.7rem 1.4rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+    transition: transform 0.05s, box-shadow 0.15s;
+  }
+
+  .btn-hero:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+  }
+
+  .btn-hero:active {
+    transform: translateY(1px);
+  }
+
+  .btn-hero-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: transparent;
+    color: #fff;
+    font-weight: 600;
+    padding: 0.7rem 1.4rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    transition: background 0.15s, border-color 0.15s;
+  }
+
+  .btn-hero-ghost:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #fff;
+  }
+
+  .rank-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.85rem;
+    height: 1.85rem;
+    border-radius: 6px;
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.12);
+    font-family: var(--font-serif-stack);
+  }
+
+  .rank-1 { background: var(--rank-1); }
+  .rank-2 { background: var(--rank-2); }
+  .rank-3 { background: var(--rank-3); }
+  .rank-4 { background: var(--rank-4); }
+
+  .rank-pill-leader {
+    transform: scale(1.15);
+    box-shadow:
+      inset 0 -2px 0 rgba(0, 0, 0, 0.18),
+      0 0 0 2px rgba(255, 255, 255, 1),
+      0 0 0 3px var(--gold);
+  }
+
+  .leader-row {
+    background: linear-gradient(
+      90deg,
+      var(--gold-soft) 0%,
+      rgba(245, 235, 207, 0.4) 55%,
+      transparent 100%
+    );
+  }
+
+  .leader-row:hover {
+    background: linear-gradient(
+      90deg,
+      var(--gold-soft) 0%,
+      rgba(245, 235, 207, 0.55) 55%,
+      rgba(243, 239, 228, 0.5) 100%
+    );
+  }
+
+  .leader-strip {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(
+      to bottom,
+      var(--gold) 0%,
+      #e0b340 50%,
+      var(--gold) 100%
+    );
+  }
+
+  .special-rule {
+    position: relative;
+    border: 2.5px solid var(--mahjong-red);
+    border-radius: 14px;
+    background:
+      radial-gradient(
+        circle at 100% 0%,
+        rgba(200, 16, 46, 0.08),
+        transparent 50%
+      ),
+      linear-gradient(180deg, #fff 0%, var(--mahjong-red-soft) 100%);
+    padding: 2rem 1.5rem 1.5rem;
+    overflow: hidden;
+    box-shadow:
+      0 8px 24px rgba(200, 16, 46, 0.18),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+  }
+
+  .special-rule__tape {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 10px;
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--mahjong-red) 0,
+      var(--mahjong-red) 14px,
+      #fff 14px,
+      #fff 26px
+    );
+  }
+
+  .special-rule__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .special-rule__pill {
+    display: inline-flex;
+    align-items: center;
+    background: var(--mahjong-red);
+    color: #fff;
+    font-family: var(--font-serif-stack);
+    font-weight: 800;
+    font-size: 0.78rem;
+    letter-spacing: 0.32em;
+    padding: 0.4rem 0.95rem 0.4rem 1.05rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(200, 16, 46, 0.3);
+  }
+
+  .special-rule__stamp {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.4rem;
+    height: 3.4rem;
+    border: 2.5px solid var(--mahjong-red);
+    border-radius: 50%;
+    color: var(--mahjong-red);
+    font-family: var(--font-serif-stack);
+    font-weight: 900;
+    font-size: 1.05rem;
+    transform: rotate(-12deg);
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 2px 6px rgba(200, 16, 46, 0.25);
+    letter-spacing: 0.15em;
+    flex-shrink: 0;
+  }
+
+  .special-rule__icon {
+    font-size: 2rem;
+    line-height: 1;
+  }
+
+  .special-rule__title {
+    font-family: var(--font-serif-stack);
+    font-size: 1.7rem;
+    font-weight: 900;
+    color: var(--mahjong-red-dark);
+    margin: 0.85rem 0 1rem;
+    line-height: 1.3;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.65rem;
+    letter-spacing: 0.02em;
+  }
+
+  @media (min-width: 640px) {
+    .special-rule__title {
+      font-size: 2rem;
+    }
+    .special-rule__icon {
+      font-size: 2.4rem;
+    }
+  }
+
+  .special-rule__body {
+    font-size: 1rem;
+    line-height: 1.85;
+    color: var(--foreground);
+    background: #fff;
+    padding: 1.15rem 1.25rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--mahjong-red);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .special-rule__body strong {
+    background: linear-gradient(
+      transparent 55%,
+      rgba(200, 16, 46, 0.28) 55%
+    );
+    font-weight: 800;
+    padding: 0 0.15rem;
+  }
+
+  .special-rule__foot {
+    font-size: 0.72rem;
+    color: var(--foreground-muted);
+    margin-top: 0.95rem;
+    line-height: 1.7;
+  }
+
+  .leader-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.15rem 0.55rem;
+    background: linear-gradient(135deg, #d4a93a 0%, var(--gold) 100%);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    border-radius: 999px;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.35),
+      0 1px 2px rgba(184, 137, 43, 0.35);
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .tile {
+    background: #fdfcf6;
+    border: 1px solid var(--tile-edge);
+    border-radius: 6px;
+    box-shadow:
+      inset 0 -3px 0 rgba(0, 0, 0, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  .text-positive {
+    color: var(--score-positive);
+    font-weight: 800;
+  }
+  .text-negative {
+    color: var(--score-negative);
+    font-weight: 800;
+  }
+
+  .hero-felt {
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.08), transparent 60%),
+      radial-gradient(circle at 80% 60%, rgba(0, 0, 0, 0.15), transparent 60%),
+      linear-gradient(135deg, var(--mahjong-green) 0%, var(--mahjong-green-dark) 100%);
+    color: #fff;
+    border: 1px solid var(--mahjong-green-dark);
+    border-radius: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-felt::after {
+    content: "";
+    position: absolute;
+    inset: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 10px;
+    pointer-events: none;
+  }
+
+  .eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  .avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    overflow: hidden;
+    background: var(--background-elevated);
+    border: 1px solid var(--border);
+    color: #fff;
+    font-family: var(--font-serif-stack);
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .avatar-sm { width: 1.75rem; height: 1.75rem; font-size: 0.8rem; }
+  .avatar-md { width: 2.5rem; height: 2.5rem; font-size: 1rem; }
+  .avatar-lg { width: 4.5rem; height: 4.5rem; font-size: 2rem; }
+}
+
+input[type="text"],
+input[type="number"],
+input[type="password"],
+input[type="datetime-local"],
+input[type="date"],
+textarea,
+select {
+  background: #fff;
+  color: var(--foreground);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  width: 100%;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--mahjong-green);
+  box-shadow: 0 0 0 3px rgba(15, 107, 59, 0.12);
 }

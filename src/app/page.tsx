@@ -1,65 +1,161 @@
-import Image from "next/image";
+import Link from "next/link";
+import {
+  loadLeagueSnapshot,
+  formatDate,
+  partitionSchedule,
+} from "@/lib/data";
+import { SectionTitle } from "@/components/section-title";
+import { StandingsTable } from "@/components/standings-table";
+import { MatchCard } from "@/components/match-card";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const { activePlayers, matches, schedule, standings } =
+    await loadLeagueSnapshot();
+  const recentMatches = matches.slice(0, 3);
+  const upcoming = partitionSchedule(schedule).upcoming.slice(0, 3);
+  const totalHanchan = matches.length;
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="page-shell space-y-12">
+      <section className="hero-felt p-8 sm:p-12">
+        <div className="relative z-[1]">
+          <div className="eyebrow text-white/80 mb-3">N League</div>
+          <h1 className="text-4xl sm:text-6xl font-black headline mb-4 leading-tight">
+            <span className="text-[var(--mahjong-red)] bg-white/95 px-3 py-1 rounded mr-2">
+              N
+            </span>
+            リーグ
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-white/85 max-w-xl">
+            半荘ごとの結果をその場で入力し、累計ポイント・順位・スケジュールを即時集計する仲間内リーグ管理サイト。基本ルールはMリーグ準拠。
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link href="/matches/new" className="btn-hero">
+              半荘結果を入力
+            </Link>
+            <Link href="/standings" className="btn-hero-ghost">
+              順位表を見る
+            </Link>
+          </div>
+          <div className="mt-8 grid grid-cols-3 gap-4 max-w-md">
+            <Stat label="参加選手" value={activePlayers.length.toString()} />
+            <Stat label="累計半荘" value={totalHanchan.toString()} />
+            <Stat
+              label="次の対戦"
+              value={
+                upcoming[0]
+                  ? formatDate(upcoming[0].scheduledAt, {
+                      month: "2-digit",
+                      day: "2-digit",
+                    })
+                  : "—"
+              }
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          </div>
         </div>
-      </main>
+      </section>
+
+      <section>
+        <SectionTitle
+          title="STANDINGS"
+          subtitle="現在の順位"
+          action={
+            <Link
+              href="/standings"
+              className="text-xs text-accent hover:underline"
+            >
+              詳細を見る →
+            </Link>
+          }
+        />
+        <StandingsTable rows={standings.slice(0, 5)} compact />
+      </section>
+
+      <section>
+        <SectionTitle
+          title="RECENT MATCHES"
+          subtitle="直近の試合"
+          action={
+            <Link
+              href="/matches"
+              className="text-xs text-accent hover:underline"
+            >
+              すべて見る →
+            </Link>
+          }
+        />
+        {recentMatches.length === 0 ? (
+          <div className="surface-card p-8 text-center text-foreground-muted">
+            まだ試合がありません。「半荘結果を入力」から最初の試合を記録しましょう。
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {recentMatches.map((m) => (
+              <MatchCard key={m.id} match={m} players={activePlayers} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section>
+        <SectionTitle
+          title="SCHEDULE"
+          subtitle="次回対戦"
+          action={
+            <Link
+              href="/schedule"
+              className="text-xs text-accent hover:underline"
+            >
+              すべて見る →
+            </Link>
+          }
+        />
+        {upcoming.length === 0 ? (
+          <div className="surface-card p-8 text-center text-foreground-muted">
+            予定が登録されていません。
+          </div>
+        ) : (
+          <ul className="space-y-2">
+            {upcoming.map((entry) => (
+              <li
+                key={entry.id}
+                className="surface-card p-4 flex items-center justify-between"
+              >
+                <div>
+                  <div className="text-xs text-foreground-muted">
+                    {formatDate(entry.scheduledAt, {
+                      weekday: "short",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </div>
+                  <div className="font-semibold mt-1">{entry.label}</div>
+                </div>
+                {entry.notes && (
+                  <div className="text-xs text-foreground-dim max-w-[40%] truncate">
+                    {entry.notes}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </div>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="border-l-2 border-white/30 pl-3">
+      <div className="text-[10px] text-white/70 tracking-[0.2em] uppercase">
+        {label}
+      </div>
+      <div className="text-2xl font-bold mt-1 numeric text-white headline">
+        {value}
+      </div>
     </div>
   );
 }
