@@ -43,3 +43,20 @@ export type StandingRow = {
   topRate: number;
   lastRate: number;
 };
+
+export type TitleAward = {
+  player: Player;
+  value: number;
+  display: string;
+  meta?: {
+    matchId: string;
+    playedAt: string;
+  };
+};
+
+export type LeagueTitles = {
+  champion: TitleAward[];
+  mostTop: TitleAward[];
+  lastAvoidance: TitleAward[];
+  highScore: TitleAward[];
+};

@@ -38,23 +38,52 @@ export function MatchCard({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         {sorted.map((r) => {
           const player = byId.get(r.playerId);
+          const isTop = r.rank === 1;
           return (
             <div
               key={r.playerId}
-              className="flex items-center gap-3 px-3 py-2 rounded-md bg-background-elevated border border-border"
+              className={`flex items-center gap-3 px-3 rounded-md border ${
+                isTop
+                  ? "match-top-row py-3 sm:col-span-2"
+                  : "py-2 bg-background-elevated border-border"
+              }`}
             >
-              <span className={`rank-pill rank-${r.rank}`}>{r.rank}</span>
-              {player && <Avatar player={player} size="sm" />}
+              <span
+                className={`rank-pill rank-${r.rank} ${
+                  isTop ? "rank-pill-leader" : ""
+                }`}
+              >
+                {r.rank}
+              </span>
+              {player && <Avatar player={player} size={isTop ? "md" : "sm"} />}
               <Link
                 href={`/players/${r.playerId}`}
-                className="font-semibold hover:text-accent truncate flex-1"
+                className={`hover:text-accent truncate flex-1 ${
+                  isTop
+                    ? "text-base sm:text-lg font-extrabold headline tracking-wide"
+                    : "font-semibold"
+                }`}
               >
                 {player?.name ?? "—"}
               </Link>
+              {isTop && (
+                <span className="leader-badge">
+                  <span aria-hidden="true">👑</span>
+                  <span className="tracking-widest">TOP</span>
+                </span>
+              )}
               <div className="text-right">
-                <div className="numeric text-sm">{r.rawScore.toLocaleString()}</div>
                 <div
-                  className={`numeric text-xs font-bold ${
+                  className={`numeric ${
+                    isTop ? "text-sm font-semibold" : "text-sm"
+                  }`}
+                >
+                  {r.rawScore.toLocaleString()}
+                </div>
+                <div
+                  className={`numeric font-bold ${
+                    isTop ? "text-base headline" : "text-xs"
+                  } ${
                     r.finalPoints > 0
                       ? "text-positive"
                       : r.finalPoints < 0

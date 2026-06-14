@@ -1,4 +1,12 @@
-import type { MatchResult, ScoringConfig, Match, Player, StandingRow } from "./types";
+import type {
+  MatchResult,
+  ScoringConfig,
+  Match,
+  Player,
+  StandingRow,
+  TitleAward,
+  LeagueTitles,
+} from "./types";
 
 export const DEFAULT_SCORING: ScoringConfig = {
   startingPoints: 25000,
@@ -111,4 +119,115 @@ export function computeStandings(
     if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
     return b.matches - a.matches;
   });
+}
+
+export const TITLE_MIN_MATCHES = 1;
+
+function pickAward<T extends { player: Player; matches: number }>(
+  rows: T[],
+  metric: (row: T) => number,
+  direction: "max" | "min",
+  formatValue: (row: T) => string,
+): TitleAward[] {
+  const candidates = rows.filter((r) => r.matches >= TITLE_MIN_MATCHES);
+  if (candidates.length === 0) return [];
+  const best = candidates.reduce((acc, row) => {
+    const v = metric(row);
+    if (direction === "max") return v > acc ? v : acc;
+    return v < acc ? v : acc;
+  }, metric(candidates[0]));
+  return candidates
+    .filter((r) => metric(r) === best)
+    .map((r) => ({
+      player: r.player,
+      value: metric(r),
+      display: formatValue(r),
+    }));
+}
+
+export function computeTitles(
+  players: Player[],
+  matches: Match[],
+  standings: StandingRow[],
+): LeagueTitles {
+  const champion = pickAward(
+    standings,
+    (r) => r.totalPoints,
+    "max",
+    (r) => `${r.totalPoints > 0 ? "+" : ""}${r.totalPoints.toFixed(1)} pt`,
+  );
+
+  const mostTop = pickAward(
+    standings,
+    (r) => r.rankCounts[0],
+    "max",
+    (r) => `${r.rankCounts[0]} 回`,
+  );
+
+  const lastAvoidance = pickAward(
+    standings,
+    (r) => r.lastRate,
+    "min",
+    (r) => `${r.lastRate.toFixed(1)}%`,
+  );
+
+  type HighScoreCandidate = {
+    player: Player;
+    matches: number;
+    rawScore: number;
+    matchId: string;
+    playedAt: string;
+  };
+  const byPlayer = new Map<string, Player>(players.map((p) => [p.id, p]));
+  const matchCountByPlayer = new Map<string, number>();
+  for (const m of matches) {
+    for (const r of m.results) {
+      matchCountByPlayer.set(
+        r.playerId,
+        (matchCountByPlayer.get(r.playerId) ?? 0) + 1,
+      );
+    }
+  }
+  const bestByPlayer = new Map<string, HighScoreCandidate>();
+  for (const m of matches) {
+    for (const r of m.results) {
+      const player = byPlayer.get(r.playerId);
+      if (!player) continue;
+      const current = bestByPlayer.get(r.playerId);
+      if (!current || r.rawScore > current.rawScore) {
+        bestByPlayer.set(r.playerId, {
+          player,
+          matches: matchCountByPlayer.get(r.playerId) ?? 0,
+          rawScore: r.rawScore,
+          matchId: m.id,
+          playedAt: m.playedAt,
+        });
+      }
+    }
+  }
+  const highScoreRows = [...bestByPlayer.values()];
+  const highScore = pickAward(
+    highScoreRows,
+    (r) => r.rawScore,
+    "max",
+    (r) => `${r.rawScore.toLocaleString()} 点`,
+  ).map((award) => {
+    const src = highScoreRows.find((r) => r.player.id === award.player.id);
+    return {
+      ...award,
+      meta: src
+        ? {
+            matchId: src.matchId,
+            playedAt: src.playedAt,
+          }
+        : undefined,
+    } satisfies TitleAward;
+  });
+
+  return {
+    champion,
+    mostTop,
+    lastAvoidance,
+    highScore,
+  };
 }

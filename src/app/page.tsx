@@ -11,7 +11,7 @@ import { MatchCard } from "@/components/match-card";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const { activePlayers, matches, schedule, standings } =
+  const { activePlayers, matches, schedule, standings, titles } =
     await loadLeagueSnapshot();
   const recentMatches = matches.slice(0, 3);
   const upcoming = partitionSchedule(schedule).upcoming.slice(0, 3);
@@ -71,6 +71,31 @@ export default async function HomePage() {
           }
         />
         <StandingsTable rows={standings.slice(0, 5)} compact />
+      </section>
+
+      <section>
+        <SectionTitle
+          title="TITLES"
+          subtitle="現時点のタイトル"
+          action={
+            <Link
+              href="/titles"
+              className="text-xs text-accent hover:underline"
+            >
+              詳細を見る →
+            </Link>
+          }
+        />
+        <div className="grid grid-cols-2 gap-2 sm:gap-3">
+          <TitleChip label="優勝" award={titles.champion[0]} icon="👑" />
+          <TitleChip label="最多トップ" award={titles.mostTop[0]} icon="🏆" />
+          <TitleChip label="ラス回避" award={titles.lastAvoidance[0]} icon="🛡️" />
+          <TitleChip
+            label="半荘最大スコア"
+            award={titles.highScore[0]}
+            icon="💥"
+          />
+        </div>
       </section>
 
       <section>
@@ -144,6 +169,34 @@ export default async function HomePage() {
         )}
       </section>
     </div>
+  );
+}
+
+function TitleChip({
+  label,
+  award,
+  icon,
+}: {
+  label: string;
+  award?: { player: { id: string; name: string }; display: string };
+  icon: string;
+}) {
+  return (
+    <Link
+      href="/titles"
+      className="surface-card p-3 flex items-center gap-2 hover:border-[var(--gold)] transition-colors"
+    >
+      <span className="text-xl" aria-hidden="true">
+        {icon}
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="eyebrow text-foreground-dim text-[10px]">{label}</div>
+        <div className="font-bold truncate">{award?.player.name ?? "—"}</div>
+        <div className="text-[11px] numeric text-foreground-muted">
+          {award?.display ?? "—"}
+        </div>
+      </div>
+    </Link>
   );
 }
 

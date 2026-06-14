@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { href: "/", label: "TOP" },
   { href: "/standings", label: "順位表" },
   { href: "/matches", label: "試合結果" },
+  { href: "/titles", label: "タイトル" },
   { href: "/schedule", label: "スケジュール" },
   { href: "/rules", label: "ルール" },
   { href: "/matches/new", label: "結果入力" },

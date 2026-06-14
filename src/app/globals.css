@@ -243,6 +243,19 @@ body {
     );
   }
 
+  .match-top-row {
+    background: linear-gradient(
+      90deg,
+      var(--gold-soft) 0%,
+      rgba(245, 235, 207, 0.55) 60%,
+      rgba(255, 255, 255, 0.9) 100%
+    );
+    border-color: var(--gold);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.6),
+      0 1px 3px rgba(184, 137, 43, 0.25);
+  }
+
   .leader-strip {
     position: absolute;
     left: 0;
@@ -402,6 +415,65 @@ body {
       0 1px 2px rgba(184, 137, 43, 0.35);
     line-height: 1;
     white-space: nowrap;
+  }
+
+  .title-card {
+    position: relative;
+    background:
+      radial-gradient(
+        circle at 100% 0%,
+        rgba(184, 137, 43, 0.12),
+        transparent 55%
+      ),
+      linear-gradient(180deg, #fff 0%, var(--gold-soft) 100%);
+    border: 1.5px solid var(--gold);
+    border-radius: 14px;
+    padding: 1.25rem 1.25rem 1rem;
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.55),
+      0 4px 14px rgba(184, 137, 43, 0.18);
+  }
+
+  .title-card__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.9rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px dashed rgba(184, 137, 43, 0.45);
+    margin-bottom: 0.9rem;
+  }
+
+  .title-card__icon {
+    font-size: 2rem;
+    line-height: 1;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.15));
+  }
+
+  .title-card__winners {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .title-card__winner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 0.85rem;
+    background: #fff;
+    border: 1px solid rgba(184, 137, 43, 0.35);
+    border-radius: 10px;
+    box-shadow: 0 1px 2px rgba(184, 137, 43, 0.12);
+  }
+
+  .title-card__empty {
+    padding: 1rem;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--foreground-dim);
+    background: #fff;
+    border: 1px dashed var(--border-strong);
+    border-radius: 10px;
   }
 
   .tile {

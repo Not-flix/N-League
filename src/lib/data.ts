@@ -1,6 +1,12 @@
 import { getStore } from "./store";
-import { computeStandings } from "./scoring";
-import type { Match, Player, ScheduleEntry, StandingRow } from "./types";
+import { computeStandings, computeTitles } from "./scoring";
+import type {
+  LeagueTitles,
+  Match,
+  Player,
+  ScheduleEntry,
+  StandingRow,
+} from "./types";
 
 export { formatDate, formatPoints } from "./format";
 
@@ -24,6 +30,7 @@ export async function loadLeagueSnapshot(): Promise<{
   matches: Match[];
   schedule: ScheduleEntry[];
   standings: StandingRow[];
+  titles: LeagueTitles;
 }> {
   const store = getStore();
   const [players, matches, schedule] = await Promise.all([
@@ -33,5 +40,6 @@ export async function loadLeagueSnapshot(): Promise<{
   ]);
   const activePlayers = players.filter((p) => p.active);
   const standings = computeStandings(activePlayers, matches);
-  return { players, activePlayers, matches, schedule, standings };
+  const titles = computeTitles(activePlayers, matches, standings);
+  return { players, activePlayers, matches, schedule, standings, titles };
 }
