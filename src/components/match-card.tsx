@@ -42,10 +42,10 @@ export function MatchCard({
           return (
             <div
               key={r.playerId}
-              className={`flex items-center gap-3 px-3 rounded-md border ${
+              className={`flex items-center gap-3 px-3 py-2 rounded-md border ${
                 isTop
-                  ? "match-top-row py-3 sm:col-span-2"
-                  : "py-2 bg-background-elevated border-border"
+                  ? "match-top-row"
+                  : "bg-background-elevated border-border opacity-90"
               }`}
             >
               <span
@@ -55,13 +55,13 @@ export function MatchCard({
               >
                 {r.rank}
               </span>
-              {player && <Avatar player={player} size={isTop ? "md" : "sm"} />}
+              {player && <Avatar player={player} size="sm" />}
               <Link
                 href={`/players/${r.playerId}`}
                 className={`hover:text-accent truncate flex-1 ${
                   isTop
-                    ? "text-base sm:text-lg font-extrabold headline tracking-wide"
-                    : "font-semibold"
+                    ? "text-base font-extrabold headline tracking-wide"
+                    : "text-sm font-medium text-foreground-muted"
                 }`}
               >
                 {player?.name ?? "—"}
@@ -75,7 +75,7 @@ export function MatchCard({
               <div className="text-right">
                 <div
                   className={`numeric ${
-                    isTop ? "text-sm font-semibold" : "text-sm"
+                    isTop ? "text-sm font-semibold" : "text-xs text-foreground-muted"
                   }`}
                 >
                   {r.rawScore.toLocaleString()}

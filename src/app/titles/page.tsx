@@ -13,32 +13,18 @@ type TitleSpec = {
   description: string;
   icon: string;
   valueLabel: string;
+  prize: string;
 };
 
 const TITLES: TitleSpec[] = [
   {
     key: "champion",
-    label: "優勝",
+    label: "26・27 season 王者",
     caption: "CHAMPION",
     description: "累計ポイント1位の称号",
     icon: "👑",
     valueLabel: "合計pt",
-  },
-  {
-    key: "mostTop",
-    label: "最多トップ賞",
-    caption: "MOST TOPS",
-    description: "1位獲得回数が最も多い選手",
-    icon: "🏆",
-    valueLabel: "トップ回数",
-  },
-  {
-    key: "lastAvoidance",
-    label: "ラス回避賞",
-    caption: "LAST AVOIDANCE",
-    description: "ラス率が最も低い選手",
-    icon: "🛡️",
-    valueLabel: "ラス率",
+    prize: "1万円相当の賞品",
   },
   {
     key: "highScore",
@@ -47,6 +33,25 @@ const TITLES: TitleSpec[] = [
     description: "半荘で記録した素点が最大の選手",
     icon: "💥",
     valueLabel: "最大素点",
+    prize: "5千円相当の賞品",
+  },
+  {
+    key: "mostTop",
+    label: "最多トップ賞",
+    caption: "MOST TOPS",
+    description: "1位獲得回数が最も多い選手",
+    icon: "🏆",
+    valueLabel: "トップ回数",
+    prize: "5千円相当の賞品",
+  },
+  {
+    key: "lastAvoidance",
+    label: "ラス回避賞",
+    caption: "LAST AVOIDANCE",
+    description: "ラス率が最も低い選手",
+    icon: "🛡️",
+    valueLabel: "ラス率",
+    prize: "3千円相当の賞品",
   },
 ];
 
@@ -82,7 +87,7 @@ export default async function TitlesPage() {
       </div>
 
       <p className="text-xs text-foreground-dim">
-        ※ 現時点の暫定値です。同値の場合は複数名が並列で表示されます。
+        ※ 現時点の暫定値です。各賞は重複可能ですが、同率の場合は王者ではない者を優先し、それでも並んだ場合はシーズンポイントが高い者を優先します。
       </p>
     </div>
   );
@@ -101,13 +106,17 @@ function TitleCard({
         <span className="title-card__icon" aria-hidden="true">
           {spec.icon}
         </span>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <div className="eyebrow text-foreground-muted">{spec.caption}</div>
-          <div className="headline text-2xl font-extrabold mt-0.5">
+          <div className="headline text-xl sm:text-2xl font-extrabold mt-0.5">
             {spec.label}
           </div>
           <div className="text-xs text-foreground-dim mt-1">
             {spec.description}
+          </div>
+          <div className="title-card__prize">
+            <span aria-hidden="true">🎁</span>
+            <span>賞品：{spec.prize}</span>
           </div>
         </div>
       </div>

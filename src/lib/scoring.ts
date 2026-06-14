@@ -123,19 +123,17 @@ export function computeStandings(
 
 export const TITLE_MIN_MATCHES = 1;
 
-function pickAward<T extends { player: Player; matches: number }>(
+function pickChampion<T extends { player: Player; matches: number }>(
   rows: T[],
   metric: (row: T) => number,
-  direction: "max" | "min",
   formatValue: (row: T) => string,
 ): TitleAward[] {
   const candidates = rows.filter((r) => r.matches >= TITLE_MIN_MATCHES);
   if (candidates.length === 0) return [];
-  const best = candidates.reduce((acc, row) => {
-    const v = metric(row);
-    if (direction === "max") return v > acc ? v : acc;
-    return v < acc ? v : acc;
-  }, metric(candidates[0]));
+  const best = candidates.reduce(
+    (acc, row) => Math.max(acc, metric(row)),
+    metric(candidates[0]),
+  );
   return candidates
     .filter((r) => metric(r) === best)
     .map((r) => ({
@@ -145,30 +143,73 @@ function pickAward<T extends { player: Player; matches: number }>(
     }));
 }
 
+function pickAwardWithTiebreak<T extends { player: Player; matches: number }>(
+  rows: T[],
+  metric: (row: T) => number,
+  direction: "max" | "min",
+  formatValue: (row: T) => string,
+  seasonPoints: (row: T) => number,
+  championIds: Set<string>,
+): TitleAward[] {
+  const candidates = rows.filter((r) => r.matches >= TITLE_MIN_MATCHES);
+  if (candidates.length === 0) return [];
+  const best = candidates.reduce((acc, row) => {
+    const v = metric(row);
+    if (direction === "max") return v > acc ? v : acc;
+    return v < acc ? v : acc;
+  }, metric(candidates[0]));
+  let top = candidates.filter((r) => metric(r) === best);
+
+  const nonChampions = top.filter((r) => !championIds.has(r.player.id));
+  if (nonChampions.length > 0) {
+    top = nonChampions;
+  }
+
+  if (top.length > 1) {
+    const maxSeason = top.reduce(
+      (acc, r) => Math.max(acc, seasonPoints(r)),
+      seasonPoints(top[0]),
+    );
+    top = top.filter((r) => seasonPoints(r) === maxSeason);
+  }
+
+  return top.map((r) => ({
+    player: r.player,
+    value: metric(r),
+    display: formatValue(r),
+  }));
+}
+
 export function computeTitles(
   players: Player[],
   matches: Match[],
   standings: StandingRow[],
 ): LeagueTitles {
-  const champion = pickAward(
+  const champion = pickChampion(
     standings,
     (r) => r.totalPoints,
-    "max",
     (r) => `${r.totalPoints > 0 ? "+" : ""}${r.totalPoints.toFixed(1)} pt`,
   );
+  const championIds = new Set(champion.map((a) => a.player.id));
 
-  const mostTop = pickAward(
+  const seasonPointsByStanding = (r: StandingRow) => r.totalPoints;
+
+  const mostTop = pickAwardWithTiebreak(
     standings,
     (r) => r.rankCounts[0],
     "max",
     (r) => `${r.rankCounts[0]} 回`,
+    seasonPointsByStanding,
+    championIds,
   );
 
-  const lastAvoidance = pickAward(
+  const lastAvoidance = pickAwardWithTiebreak(
     standings,
     (r) => r.lastRate,
     "min",
     (r) => `${r.lastRate.toFixed(1)}%`,
+    seasonPointsByStanding,
+    championIds,
   );
 
   type HighScoreCandidate = {
@@ -206,11 +247,16 @@ export function computeTitles(
     }
   }
   const highScoreRows = [...bestByPlayer.values()];
-  const highScore = pickAward(
+  const seasonPointsById = new Map(
+    standings.map((s) => [s.player.id, s.totalPoints]),
+  );
+  const highScore = pickAwardWithTiebreak(
     highScoreRows,
     (r) => r.rawScore,
     "max",
     (r) => `${r.rawScore.toLocaleString()} 点`,
+    (r) => seasonPointsById.get(r.player.id) ?? 0,
+    championIds,
   ).map((award) => {
     const src = highScoreRows.find((r) => r.player.id === award.player.id);
     return {

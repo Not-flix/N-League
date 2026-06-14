@@ -7,6 +7,8 @@ import {
 import { SectionTitle } from "@/components/section-title";
 import { StandingsTable } from "@/components/standings-table";
 import { MatchCard } from "@/components/match-card";
+import { Avatar } from "@/components/avatar";
+import type { TitleAward } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -87,14 +89,18 @@ export default async function HomePage() {
           }
         />
         <div className="grid grid-cols-2 gap-2 sm:gap-3">
-          <TitleChip label="優勝" award={titles.champion[0]} icon="👑" />
-          <TitleChip label="最多トップ" award={titles.mostTop[0]} icon="🏆" />
-          <TitleChip label="ラス回避" award={titles.lastAvoidance[0]} icon="🛡️" />
+          <TitleChip
+            label="26・27 season 王者"
+            award={titles.champion[0]}
+            icon="👑"
+          />
           <TitleChip
             label="半荘最大スコア"
             award={titles.highScore[0]}
             icon="💥"
           />
+          <TitleChip label="最多トップ" award={titles.mostTop[0]} icon="🏆" />
+          <TitleChip label="ラス回避" award={titles.lastAvoidance[0]} icon="🛡️" />
         </div>
       </section>
 
@@ -178,7 +184,7 @@ function TitleChip({
   icon,
 }: {
   label: string;
-  award?: { player: { id: string; name: string }; display: string };
+  award?: TitleAward;
   icon: string;
 }) {
   return (
@@ -186,13 +192,22 @@ function TitleChip({
       href="/titles"
       className="surface-card p-3 flex items-center gap-2 hover:border-[var(--gold)] transition-colors"
     >
-      <span className="text-xl" aria-hidden="true">
+      <span className="text-xl shrink-0" aria-hidden="true">
         {icon}
       </span>
       <div className="min-w-0 flex-1">
         <div className="eyebrow text-foreground-dim text-[10px]">{label}</div>
-        <div className="font-bold truncate">{award?.player.name ?? "—"}</div>
-        <div className="text-[11px] numeric text-foreground-muted">
+        <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
+          {award?.player ? (
+            <Avatar player={award.player} size="sm" />
+          ) : (
+            <span className="w-7 h-7 rounded-full bg-background-elevated border border-border shrink-0" />
+          )}
+          <span className="font-bold truncate">
+            {award?.player.name ?? "—"}
+          </span>
+        </div>
+        <div className="text-[11px] numeric text-foreground-muted mt-0.5">
           {award?.display ?? "—"}
         </div>
       </div>

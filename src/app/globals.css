@@ -449,6 +449,21 @@ body {
     filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.15));
   }
 
+  .title-card__prize {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.55rem;
+    padding: 0.25rem 0.6rem;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid var(--gold);
+    border-radius: 999px;
+    color: var(--mahjong-red-dark);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
   .title-card__winners {
     display: flex;
     flex-direction: column;
