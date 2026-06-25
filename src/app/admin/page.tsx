@@ -2,6 +2,7 @@ import { getStore } from "@/lib/store";
 import { SectionTitle } from "@/components/section-title";
 import { formatDate } from "@/lib/data";
 import { PlayerRow } from "./player-row";
+import { DeleteButton } from "./delete-button";
 import {
   addPlayerAction,
   saveConfigAction,
@@ -159,15 +160,11 @@ export default async function AdminPage() {
                   </div>
                 )}
               </div>
-              <form action={deleteScheduleAction}>
-                <input type="hidden" name="id" value={entry.id} />
-                <button
-                  type="submit"
-                  className="btn-secondary text-xs py-1.5 text-danger border-danger/40"
-                >
-                  削除
-                </button>
-              </form>
+              <DeleteButton
+                action={deleteScheduleAction}
+                id={entry.id}
+                confirmMessage={`予定「${entry.label}」を削除しますか？この操作は取り消せません。`}
+              />
             </div>
           ))}
           <form
@@ -230,15 +227,11 @@ export default async function AdminPage() {
                     .join(" / ")}
                 </div>
               </div>
-              <form action={deleteMatchAction}>
-                <input type="hidden" name="id" value={m.id} />
-                <button
-                  type="submit"
-                  className="btn-secondary text-xs py-1.5 text-danger border-danger/40"
-                >
-                  削除
-                </button>
-              </form>
+              <DeleteButton
+                action={deleteMatchAction}
+                id={m.id}
+                confirmMessage="この試合を削除しますか？順位・点数の集計に影響します。この操作は取り消せません。"
+              />
             </div>
           ))}
         </div>
