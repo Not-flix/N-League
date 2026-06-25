@@ -65,7 +65,7 @@ export default async function AdminPage() {
           </form>
         </div>
         <p className="mt-2 text-xs text-foreground-dim">
-          アイコンは正方形にリサイズして保存されます（最大256px、JPEG圧縮）。
+          画像を選ぶとトリミング画面が開き、位置調整と拡大ができます。正方形（256px、JPEG圧縮）で保存されます。
         </p>
       </section>
 

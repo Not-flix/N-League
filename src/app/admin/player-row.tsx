@@ -4,27 +4,7 @@ import { useRef, useState, useTransition } from "react";
 import { Avatar } from "@/components/avatar";
 import type { Player } from "@/lib/types";
 import { deletePlayerAction, updatePlayerAction } from "./actions";
-
-const MAX_SIZE = 256;
-
-async function resizeImage(file: File): Promise<string> {
-  const bitmap = await createImageBitmap(file);
-  const ratio = Math.min(
-    MAX_SIZE / bitmap.width,
-    MAX_SIZE / bitmap.height,
-    1,
-  );
-  const w = Math.max(1, Math.round(bitmap.width * ratio));
-  const h = Math.max(1, Math.round(bitmap.height * ratio));
-  const canvas = document.createElement("canvas");
-  canvas.width = w;
-  canvas.height = h;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("canvas 2d context unavailable");
-  ctx.drawImage(bitmap, 0, 0, w, h);
-  bitmap.close?.();
-  return canvas.toDataURL("image/jpeg", 0.82);
-}
+import { ImageCropper } from "./image-cropper";
 
 export function PlayerRow({
   player,
@@ -39,22 +19,19 @@ export function PlayerRow({
     player.avatarDataUrl ?? "",
   );
   const [error, setError] = useState<string | null>(null);
+  const [cropFile, setCropFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isPending, startTransition] = useTransition();
   const [isDeleting, startDeleteTransition] = useTransition();
   const canDelete = matchCount === 0;
 
-  async function onPickFile(file: File) {
+  function onPickFile(file: File) {
     setError(null);
-    try {
-      if (file.size > 6 * 1024 * 1024) {
-        throw new Error("画像が大きすぎます（6MB以下にしてください）");
-      }
-      const dataUrl = await resizeImage(file);
-      setAvatarDataUrl(dataUrl);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+    if (file.size > 6 * 1024 * 1024) {
+      setError("画像が大きすぎます（6MB以下にしてください）");
+      return;
     }
+    setCropFile(file);
   }
 
   function handleSubmit(formData: FormData) {
@@ -119,7 +96,7 @@ export function PlayerRow({
           className="hidden"
           onChange={(e) => {
             const f = e.target.files?.[0];
-            if (f) void onPickFile(f);
+            if (f) onPickFile(f);
             e.target.value = "";
           }}
         />
@@ -174,6 +151,16 @@ export function PlayerRow({
         </p>
       )}
       {error && <div className="text-sm text-danger">{error}</div>}
+      {cropFile && (
+        <ImageCropper
+          file={cropFile}
+          onCancel={() => setCropFile(null)}
+          onConfirm={(dataUrl) => {
+            setAvatarDataUrl(dataUrl);
+            setCropFile(null);
+          }}
+        />
+      )}
     </form>
   );
 }
