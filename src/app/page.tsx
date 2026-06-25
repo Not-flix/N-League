@@ -89,18 +89,10 @@ export default async function HomePage() {
           }
         />
         <div className="grid grid-cols-2 gap-2 sm:gap-3">
-          <TitleChip
-            label="26・27 season 王者"
-            award={titles.champion[0]}
-            icon="👑"
-          />
-          <TitleChip
-            label="半荘最大スコア"
-            award={titles.highScore[0]}
-            icon="💥"
-          />
-          <TitleChip label="最多トップ" award={titles.mostTop[0]} icon="🏆" />
-          <TitleChip label="ラス回避" award={titles.lastAvoidance[0]} icon="🛡️" />
+          <TitleChip label="26・27 season 王者" award={titles.champion[0]} />
+          <TitleChip label="半荘最大スコア" award={titles.highScore[0]} />
+          <TitleChip label="最多トップ" award={titles.mostTop[0]} />
+          <TitleChip label="ラス回避" award={titles.lastAvoidance[0]} />
         </div>
       </section>
 
@@ -181,31 +173,26 @@ export default async function HomePage() {
 function TitleChip({
   label,
   award,
-  icon,
 }: {
   label: string;
   award?: TitleAward;
-  icon: string;
 }) {
   return (
     <Link
       href="/titles"
-      className="surface-card p-3 flex items-center gap-2 hover:border-[var(--gold)] transition-colors"
+      className="surface-card p-4 flex items-center gap-3 sm:gap-4 hover:border-[var(--gold)] transition-colors"
     >
-      <span className="text-xl shrink-0" aria-hidden="true">
-        {icon}
-      </span>
+      {award?.player ? (
+        <Avatar player={award.player} size="lg" />
+      ) : (
+        <span className="w-[4.5rem] h-[4.5rem] rounded-full bg-background-elevated border border-border shrink-0" />
+      )}
       <div className="min-w-0 flex-1">
-        <div className="eyebrow text-foreground-dim text-[10px]">{label}</div>
-        <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
-          {award?.player ? (
-            <Avatar player={award.player} size="sm" />
-          ) : (
-            <span className="w-7 h-7 rounded-full bg-background-elevated border border-border shrink-0" />
-          )}
-          <span className="font-bold truncate">
-            {award?.player.name ?? "—"}
-          </span>
+        <div className="text-base sm:text-lg font-black headline leading-tight">
+          {label}
+        </div>
+        <div className="font-bold truncate mt-1">
+          {award?.player.name ?? "—"}
         </div>
         <div className="text-[11px] numeric text-foreground-muted mt-0.5">
           {award?.display ?? "—"}
