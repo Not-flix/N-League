@@ -41,7 +41,7 @@ export default async function HomePage() {
               順位表を見る
             </Link>
           </div>
-          <div className="mt-8 grid grid-cols-3 gap-4 max-w-md">
+          <div className="mt-8 grid grid-cols-3 gap-2 sm:gap-4 max-w-md">
             <Stat label="参加選手" value={activePlayers.length.toString()} />
             <Stat label="累計半荘" value={totalHanchan.toString()} />
             <Stat
@@ -217,11 +217,11 @@ function TitleChip({
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="border-l-2 border-white/30 pl-3">
-      <div className="text-[10px] text-white/70 tracking-[0.2em] uppercase">
+    <div className="border-l-2 border-white/30 pl-2 sm:pl-3">
+      <div className="text-[10px] text-white/70 tracking-[0.1em] sm:tracking-[0.2em] uppercase">
         {label}
       </div>
-      <div className="text-xl sm:text-2xl font-bold mt-1 numeric text-white headline">
+      <div className="text-base sm:text-2xl font-bold mt-1 numeric text-white headline whitespace-nowrap">
         {value}
       </div>
     </div>
